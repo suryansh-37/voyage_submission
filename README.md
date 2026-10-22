@@ -1,173 +1,95 @@
-# ClassicModels PostgreSQL Customer Dashboard
+# Classic Models Customer Dashboard
 
-A lightweight, full-stack database exploration web app built with **Python (Flask)** and **PostgreSQL**. It allows users to browse customer accounts, search and filter records in real time, view historical orders and payments through relational SQL queries, and export data directly to CSV.
+A web application built with Python (Flask) and PostgreSQL to explore customer records, search by name or country, and check order history.
 
----
+## Dataset Origin
 
-## 📌 Dataset Origin & Background
+This project uses the Classic Models sample database, originally created for the Eclipse BIRT project to simulate a scale-model car and vehicle retailer.
 
-This project uses the well-known **[Classic Models Sample Database](https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)**, originally created by the Eclipse BIRT project as a realistic business model for a scale-model car retailer.
+The database includes 11 tables:
+- Core tables: customers, employees, offices, products, productlines
+- Orders and transactions: orders, orderdetails, payments
+- Summary views: top_10_clientes_2005, top_10_productos_2005, ventas_mensuales (views created for a 2005 sales analysis lab).
 
-The database features 11 related tables:
-- **Core Entities**: `customers`, `employees`, `offices`, `products`, `productlines`
-- **Transactions**: `orders`, `orderdetails`, `payments`
-- **Custom Analysis Views**: `top_10_clientes_2005`, `top_10_productos_2005`, `ventas_mensuales` (analytical views created during a database lab analyzing 2005 sales data).
+Dataset reference: [PostgreSQL Tutorial ClassicModels](https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)
 
----
+## Features
 
-## 🚀 Key Features
+- Live database queries: Connects directly to PostgreSQL (practice_db) using psycopg2.
+- Full customer list: Displays all 122 customers with address, contact person, phone, and credit limit.
+- Order history popup: Click "View Orders" on any customer to see their recent orders and total payments made.
+- Search and country filter: Filter rows instantly without page reloads.
+- Summary cards: Shows total customers, total credit extended, and countries served.
+- Export CSV: Downloads the visible table as a .csv file for Excel.
 
-- **Live Database Connection**: Queries PostgreSQL (`practice_db`) directly using Python and `psycopg2`. No mock JSON fixtures.
-- **Full Customer Directory**: Displays all 122 customers across 11 columns, including contact names, street addresses, countries, and credit limits.
-- **Relational Order Tracking (Drilldown)**: Click **"View Orders"** on any customer row to dynamically fetch their order history and total payments made from the `orders` and `payments` tables.
-- **Instant Search & Country Filtering**: Filter customers in real time by company name, city, phone number, or country without reloading the page.
-- **Executive Metric Cards**: Summary badges at the top showing Total Customers (122), Total Credit Extended ($8.25M), and Countries Represented (28).
-- **Export to CSV**: Download the visible customer table directly to an Excel-friendly `.csv` file with one click.
+## Technologies Used
 
----
+- Python 3
+- Flask and flask-cors
+- PostgreSQL
+- psycopg2-binary
+- HTML, CSS, JavaScript (Vanilla)
 
-## 🛠️ Tech Stack
+## Project Files
 
-- **Backend**: Python 3, Flask, `flask-cors`
-- **Database**: PostgreSQL, `psycopg2-binary`
-- **Frontend**: HTML5, Vanilla CSS3, JavaScript (DOM API & Fetch)
+- app.py - Flask backend with database connection and API routes
+- dashbord.html - Customer table page with search and popup script
+- dashbord.css - Styles for table and modal
+- index.html - Home landing page
+- about.html - Project description and notes
+- styles.css - Main styles for navbar and cards
+- requirements.txt - List of Python libraries needed
+- .gitignore - Files git should ignore
 
----
+## Steps to Run the Project
 
-## 💻 Project Structure
+### 1. Prerequisites
+- Python 3 installed
+- PostgreSQL installed and running on port 5432
+- Database named practice_db with ClassicModels tables imported
 
-```text
-your_app/
-├── app.py              # Flask server and PostgreSQL API routes
-├── dashbord.html       # Customer dashboard & interactive script
-├── dashbord.css        # Dashboard layout, cards & modal styling
-├── index.html          # Application home page
-├── about.html          # Project architecture overview
-├── styles.css          # Shared global styles & navigation
-├── requirements.txt    # Python dependencies
-├── .gitignore          # Git exclusion rules
-└── README.md           # Documentation
-```
-
----
-
-## ⚙️ Step-by-Step Guide to Run This Project
-
-Follow these steps to set up and run the project locally on your machine:
-
-### Step 1: Check Prerequisites
-Make sure you have installed on your computer:
-1. **Python 3.8 or higher**: Check by opening a terminal and running:
-   ```bash
-   python --version
-   ```
-2. **PostgreSQL & pgAdmin**: Check that PostgreSQL service is running on port `5432`.
-
----
-
-### Step 2: Clone or Download the Project
-Open your terminal (or Command Prompt / PowerShell) and navigate to your preferred workspace:
+### 2. Clone or download
+Open terminal or command prompt in your folder:
 ```bash
 git clone https://github.com/suryansh-37/your_app.git
 cd your_app
 ```
 
----
-
-### Step 3: (Recommended) Create a Virtual Environment
-A virtual environment keeps your project dependencies clean and isolated:
-
-- **On Windows (PowerShell / Command Prompt)**:
-  ```powershell
-  python -m venv venv
-  .\venv\Scripts\activate
-  ```
-- **On macOS / Linux**:
-  ```bash
-  python3 -m venv venv
-  source venv/bin/activate
-  ```
-
----
-
-### Step 4: Install Required Python Packages
-Install the required dependencies using `pip`:
+### 3. Install requirements
+Run pip install:
 ```bash
 pip install -r requirements.txt
 ```
-This will install:
-- `Flask` (lightweight web server)
-- `flask-cors` (handles browser cross-origin requests)
-- `psycopg2-binary` (PostgreSQL driver for Python)
 
----
-
-### Step 5: Set Up the PostgreSQL Database
-1. Open **pgAdmin** (or `psql` command line).
-2. Create a new database named **`practice_db`**:
-   ```sql
-   CREATE DATABASE practice_db;
-   ```
-3. Import or restore the ClassicModels `.sql` dataset into `practice_db`.
-4. Verify the tables exist: `customers`, `orders`, `payments`, `employees`, etc.
-
----
-
-### Step 6: Configure Database Connection
-Open `app.py` in your code editor and verify your PostgreSQL credentials:
+### 4. Check database password
+Open app.py and make sure DB_USER and DB_PASS match your local postgres login:
 ```python
-# Database connection details in app.py
 DB_HOST = "localhost"
 DB_NAME = "practice_db"
-DB_USER = "postgres"       # your postgres username
-DB_PASS = "1234"           # your master password from pgAdmin
+DB_USER = "postgres"
+DB_PASS = "1234" # change to your pgAdmin password
 DB_PORT = 5432
 ```
 
----
-
-### Step 7: Run the Application
-Start the Flask server from your terminal:
+### 5. Run the server
+Run the python script:
 ```bash
 python app.py
 ```
 
-You should see an output like:
+You should see:
 ```text
 Starting Flask server on http://localhost:5000 ...
- * Running on http://127.0.0.1:5000
 ```
 
----
+### 6. Open in browser
+Open your browser and visit:
+- Dashboard: http://localhost:5000/dashbord.html
+- Home: http://localhost:5000/index.html
+- About: http://localhost:5000/about.html
 
-### Step 8: Open in Your Browser
-Once the server is running, open your web browser (Chrome, Edge, Firefox) and visit:
+## Common Issues
 
-- **Customer Dashboard**: [http://localhost:5000/dashbord.html](http://localhost:5000/dashbord.html)
-- **Home Overview**: [http://localhost:5000/index.html](http://localhost:5000/index.html)
-- **Architecture & Notes**: [http://localhost:5000/about.html](http://localhost:5000/about.html)
-
----
-
-## 🔍 Troubleshooting
-
-| Issue | Likely Cause | Solution |
-| :--- | :--- | :--- |
-| **"Could not connect to database"** | Incorrect password or PostgreSQL not running | Check `DB_PASS` in `app.py` and ensure the PostgreSQL service is started in Windows Services. |
-| **"Address already in use (Port 5000)"** | Another process is using port 5000 | Change `port=5000` to `port=5050` at the bottom of `app.py`, and visit `http://localhost:5050`. |
-| **"ModuleNotFoundError: No module named 'psycopg2'"** | Missing dependencies | Run `pip install -r requirements.txt` inside your active virtual environment. |
-
----
-
-## 📡 API Endpoints
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/customers` | Returns all 122 customer records sorted alphabetically |
-| `GET` | `/api/stats` | Computes aggregate KPI totals (customers, credit sum, countries) |
-| `GET` | `/api/customer/<id>/orders` | Fetches recent orders and total payments for a customer |
-
----
-
-## 📝 License
-This project is open-source and intended for educational and portfolio demonstration purposes.
+- "Could not connect to database": Double check your PostgreSQL service is started in Windows and your password in app.py is correct.
+- "Port 5000 in use": You can change port=5000 to port=5050 in app.py and open http://localhost:5050/dashbord.html.
+- "No module named psycopg2": Run pip install psycopg2-binary in your terminal.

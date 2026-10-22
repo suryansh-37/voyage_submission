@@ -5,11 +5,11 @@ import psycopg2
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
-# Database connection details
+# my postgres database connection settings
 DB_HOST = "localhost"
 DB_NAME = "practice_db"
 DB_USER = "postgres"
-DB_PASS = "1234"
+DB_PASS = "1234" # change this to your password
 DB_PORT = 5432
 
 def connect_db():
@@ -22,67 +22,75 @@ def connect_db():
     )
     return conn
 
-# Home page route
+# home page
 @app.route('/')
 def home():
     return send_from_directory('.', 'index.html')
 
-# 1. API: Get all customer records
+# get all customers
 @app.route('/api/customers')
 def get_customers():
     try:
         conn = connect_db()
         cur = conn.cursor()
         
+        # select all customers ordered by name
         cur.execute('SELECT * FROM customers ORDER BY "customerName" ASC')
         rows = cur.fetchall()
         
+        # get column headers
         columns = [desc[0] for desc in cur.description]
+        
         customers_list = []
         for row in rows:
-            customer = {}
+            cust = {}
             for i in range(len(columns)):
-                customer[columns[i]] = row[i]
-            customers_list.append(customer)
+                cust[columns[i]] = row[i]
+            customers_list.append(cust)
             
         cur.close()
         conn.close()
         return jsonify(customers_list)
         
     except Exception as e:
-        print("Error fetching customers:", e)
+        print("Database error:", e)
         return jsonify({"error": str(e)}), 500
 
-# 2. API: Get summary statistics for dashboard cards
+# get total stats for top cards
 @app.route('/api/stats')
 def get_stats():
     try:
         conn = connect_db()
         cur = conn.cursor()
         
+        # query count, total credit and distinct countries
         cur.execute('SELECT COUNT(*), COALESCE(SUM("creditLimit"), 0), COUNT(DISTINCT country) FROM customers;')
-        total_customers, total_credit, total_countries = cur.fetchone()
+        data = cur.fetchone()
+        
+        total_customers = data[0]
+        total_credit = float(data[1])
+        total_countries = data[2]
         
         cur.close()
         conn.close()
         
         return jsonify({
             "total_customers": total_customers,
-            "total_credit": float(total_credit),
+            "total_credit": total_credit,
             "total_countries": total_countries
         })
     except Exception as e:
-        print("Error fetching stats:", e)
+        print("Stats error:", e)
         return jsonify({"error": str(e)}), 500
 
-# 3. API: Get orders and payment info for a specific customer
+# get orders and payments for one customer
 @app.route('/api/customer/<int:cust_id>/orders')
 def get_customer_orders(cust_id):
     try:
         conn = connect_db()
         cur = conn.cursor()
         
-        # Fetch up to 5 recent orders for this customer
+        # get recent orders for this customer id
         cur.execute('SELECT "orderNumber", "orderDate", status FROM orders WHERE "customerNumber" = %s ORDER BY "orderDate" DESC LIMIT 5;', (cust_id,))
         order_rows = cur.fetchall()
         
@@ -94,7 +102,7 @@ def get_customer_orders(cust_id):
                 "status": r[2]
             })
             
-        # Fetch total payments made by this customer
+        # get sum of payments made
         cur.execute('SELECT COALESCE(SUM(amount), 0) FROM payments WHERE "customerNumber" = %s;', (cust_id,))
         total_paid = float(cur.fetchone()[0])
         
@@ -106,7 +114,7 @@ def get_customer_orders(cust_id):
             "total_paid": total_paid
         })
     except Exception as e:
-        print("Error fetching customer orders:", e)
+        print("Error getting customer orders:", e)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

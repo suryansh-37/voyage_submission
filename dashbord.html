@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <!-- Top navigation bar -->
+    <!-- top navbar -->
     <div class="topsection">
         <h1>Database access tool</h1> 
         <nav class="navbar">
@@ -26,23 +26,23 @@
         <h1>Classic Models Customer Directory</h1>
         <p>Live customer data & order tracking from PostgreSQL (practice_db)</p>
 
-        <!-- 1. Metric Summary Cards -->
+        <!-- summary cards -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-title">Total Customers</div>
-                <div class="stat-value" id="stat-customers">--</div>
+                <div class="stat-value" id="stat-customers">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-title">Total Credit Extended</div>
-                <div class="stat-value" id="stat-credit" style="color: #059669;">--</div>
+                <div class="stat-value" id="stat-credit" style="color: #059669;">$0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-title">Countries Served</div>
-                <div class="stat-value" id="stat-countries" style="color: #714da6;">--</div>
+                <div class="stat-value" id="stat-countries" style="color: #714da6;">0</div>
             </div>
         </div>
 
-        <!-- 2. Controls Toolbar (Search, Filter, Export) -->
+        <!-- search and filter controls -->
         <div class="table-controls">
             <div class="filter-group">
                 <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by name, city, phone..." />
@@ -53,10 +53,10 @@
 
                 <button class="btn-export" onclick="exportCSV()">Export to CSV</button>
             </div>
-            <span id="recordCount" class="count-badge">Loading data...</span>
+            <span id="recordCount" class="count-badge">Loading...</span>
         </div>
 
-        <!-- 3. Table of Customer Records -->
+        <!-- table for customers -->
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -83,7 +83,7 @@
         </div>
     </div>
 
-    <!-- 4. Customer Orders & Payment Popup Modal -->
+    <!-- popup modal for customer orders -->
     <div id="ordersModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -99,23 +99,30 @@
     <script>
         let allCustomersData = [];
 
-        // 1. Fetch customers and summary statistics from Python backend
+        // function to load data from python backend
         function loadDashboard() {
-            // Fetch summary stats
+            // fetch stats
             fetch('http://localhost:5000/api/stats')
-                .then(function(res) { return res.json(); })
+                .then(function(res) {
+                    return res.json();
+                })
                 .then(function(stats) {
                     document.getElementById('stat-customers').innerText = stats.total_customers;
                     document.getElementById('stat-credit').innerText = '$' + Number(stats.total_credit).toLocaleString();
                     document.getElementById('stat-countries').innerText = stats.total_countries + ' Countries';
                 })
-                .catch(function(err) { console.log('Stats error:', err); });
+                .catch(function(err) {
+                    console.log('Error loading stats:', err);
+                });
 
-            // Fetch customer records
+            // fetch all customers
             fetch('http://localhost:5000/api/customers')
-                .then(function(res) { return res.json(); })
+                .then(function(res) {
+                    return res.json();
+                })
                 .then(function(data) {
                     allCustomersData = data;
+                    console.log('Customers loaded:', data.length);
                     populateCountryDropdown(data);
                     renderCustomerRows(data);
                 })
@@ -126,23 +133,28 @@
                 });
         }
 
-        // 2. Populate Country Filter Dropdown
+        // add countries to dropdown
         function populateCountryDropdown(data) {
             let select = document.getElementById('countryFilter');
-            let countrySet = new Set();
+            let countryList = [];
+            
             for (let i = 0; i < data.length; i++) {
-                if (data[i].country) countrySet.add(data[i].country);
+                let country = data[i].country;
+                if (country && countryList.indexOf(country) === -1) {
+                    countryList.push(country);
+                }
             }
-            let sortedCountries = Array.from(countrySet).sort();
-            for (let i = 0; i < sortedCountries.length; i++) {
+            countryList.sort();
+
+            for (let i = 0; i < countryList.length; i++) {
                 let opt = document.createElement('option');
-                opt.value = sortedCountries[i];
-                opt.innerText = sortedCountries[i];
+                opt.value = countryList[i];
+                opt.innerText = countryList[i];
                 select.appendChild(opt);
             }
         }
 
-        // 3. Render Table Rows
+        // draw rows in table
         function renderCustomerRows(customers) {
             let tableBody = document.getElementById('customer-table-body');
             tableBody.innerHTML = '';
@@ -150,7 +162,7 @@
             document.getElementById('recordCount').innerText = customers.length + ' Customers shown';
 
             if (customers.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">No customers found matching filter.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">No customers found.</td></tr>';
                 return;
             }
 
@@ -160,9 +172,14 @@
 
                 let contact = (c.contactFirstName || '') + ' ' + (c.contactLastName || '');
                 let address = c.addressLine1 || '';
-                if (c.addressLine2) address += ', ' + c.addressLine2;
+                if (c.addressLine2) {
+                    address = address + ', ' + c.addressLine2;
+                }
 
-                let credit = c.creditLimit ? '$' + Number(c.creditLimit).toLocaleString() : '$0';
+                let credit = '$0';
+                if (c.creditLimit) {
+                    credit = '$' + Number(c.creditLimit).toLocaleString();
+                }
 
                 row.innerHTML = 
                     '<td><strong>#' + c.customerNumber + '</strong></td>' +
@@ -181,7 +198,7 @@
             }
         }
 
-        // 4. Combined Filter by Keyword and Country
+        // search and country filter
         function filterTable() {
             let search = document.getElementById('searchInput').value.toLowerCase();
             let country = document.getElementById('countryFilter').value;
@@ -204,20 +221,22 @@
             renderCustomerRows(filtered);
         }
 
-        // 5. Show Customer Order History Modal (relational data)
+        // show customer orders popup
         function showOrders(custId, custName) {
             document.getElementById('modalCustomerTitle').innerText = custName + ' (Customer #' + custId + ')';
-            document.getElementById('modalBody').innerHTML = '<p>Fetching orders and payments from PostgreSQL...</p>';
+            document.getElementById('modalBody').innerHTML = '<p>Loading order history...</p>';
             document.getElementById('ordersModal').style.display = 'flex';
 
             fetch('http://localhost:5000/api/customer/' + custId + '/orders')
-                .then(function(res) { return res.json(); })
+                .then(function(res) {
+                    return res.json();
+                })
                 .then(function(data) {
-                    let html = '<p style="margin-bottom: 12px;"><strong>Total Payments Made:</strong> <span style="color: #059669; font-weight: bold;">$' + Number(data.total_paid).toLocaleString() + '</span></p>';
+                    let html = '<p style="margin-bottom: 12px;"><strong>Total Payments:</strong> <span style="color: #059669; font-weight: bold;">$' + Number(data.total_paid).toLocaleString() + '</span></p>';
                     html += '<h4 style="margin-bottom: 8px; font-size: 14px;">Recent Orders (' + data.orders.length + ')</h4>';
 
                     if (data.orders.length === 0) {
-                        html += '<p style="color: #64748b; font-size: 13px;">No past orders recorded for this customer.</p>';
+                        html += '<p style="color: #64748b; font-size: 13px;">No past orders found for this customer.</p>';
                     } else {
                         for (let i = 0; i < data.orders.length; i++) {
                             let o = data.orders[i];
@@ -231,15 +250,17 @@
                     document.getElementById('modalBody').innerHTML = html;
                 })
                 .catch(function(err) {
+                    console.log('Error:', err);
                     document.getElementById('modalBody').innerHTML = '<p style="color: red;">Error fetching order details.</p>';
                 });
         }
 
+        // close modal
         function closeModal() {
             document.getElementById('ordersModal').style.display = 'none';
         }
 
-        // 6. Export currently visible records to CSV file
+        // export to csv
         function exportCSV() {
             if (allCustomersData.length === 0) {
                 alert('No data to export');
@@ -247,7 +268,6 @@
             }
 
             let csv = 'CustomerNumber,CustomerName,ContactName,Phone,Address,City,State,PostalCode,Country,CreditLimit\n';
-
             let table = document.getElementById('customer-table-body');
             let trs = table.getElementsByTagName('tr');
 
@@ -266,11 +286,11 @@
             let blob = new Blob([csv], { type: 'text/csv' });
             let link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'customers_list.csv';
+            link.download = 'customers.csv';
             link.click();
         }
 
-        // Load dashboard on page load
+        // run when page loads
         window.onload = function() {
             loadDashboard();
         };
