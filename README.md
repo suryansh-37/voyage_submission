@@ -51,44 +51,111 @@ your_app/
 
 ---
 
-## ⚙️ Setup and Running Locally
+## ⚙️ Step-by-Step Guide to Run This Project
 
-### 1. Prerequisites
-- Python 3.8 or higher installed
-- PostgreSQL installed and running locally on port `5432`
-- A database named `practice_db` with the ClassicModels tables loaded
+Follow these steps to set up and run the project locally on your machine:
 
-### 2. Clone the Repository
+### Step 1: Check Prerequisites
+Make sure you have installed on your computer:
+1. **Python 3.8 or higher**: Check by opening a terminal and running:
+   ```bash
+   python --version
+   ```
+2. **PostgreSQL & pgAdmin**: Check that PostgreSQL service is running on port `5432`.
+
+---
+
+### Step 2: Clone or Download the Project
+Open your terminal (or Command Prompt / PowerShell) and navigate to your preferred workspace:
 ```bash
 git clone https://github.com/suryansh-37/your_app.git
 cd your_app
 ```
 
-### 3. Install Python Dependencies
+---
+
+### Step 3: (Recommended) Create a Virtual Environment
+A virtual environment keeps your project dependencies clean and isolated:
+
+- **On Windows (PowerShell / Command Prompt)**:
+  ```powershell
+  python -m venv venv
+  .\venv\Scripts\activate
+  ```
+- **On macOS / Linux**:
+  ```bash
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+
+---
+
+### Step 4: Install Required Python Packages
+Install the required dependencies using `pip`:
 ```bash
 pip install -r requirements.txt
 ```
+This will install:
+- `Flask` (lightweight web server)
+- `flask-cors` (handles browser cross-origin requests)
+- `psycopg2-binary` (PostgreSQL driver for Python)
 
-### 4. Configure Database Credentials
-Open `app.py` and verify your local PostgreSQL credentials:
+---
+
+### Step 5: Set Up the PostgreSQL Database
+1. Open **pgAdmin** (or `psql` command line).
+2. Create a new database named **`practice_db`**:
+   ```sql
+   CREATE DATABASE practice_db;
+   ```
+3. Import or restore the ClassicModels `.sql` dataset into `practice_db`.
+4. Verify the tables exist: `customers`, `orders`, `payments`, `employees`, etc.
+
+---
+
+### Step 6: Configure Database Connection
+Open `app.py` in your code editor and verify your PostgreSQL credentials:
 ```python
+# Database connection details in app.py
 DB_HOST = "localhost"
 DB_NAME = "practice_db"
-DB_USER = "postgres"
-DB_PASS = "1234"      # replace with your master password
+DB_USER = "postgres"       # your postgres username
+DB_PASS = "1234"           # your master password from pgAdmin
 DB_PORT = 5432
 ```
 
-### 5. Start the Flask Server
+---
+
+### Step 7: Run the Application
+Start the Flask server from your terminal:
 ```bash
 python app.py
 ```
-The server will start at: `http://localhost:5000`
 
-### 6. View in Browser
-- **Home Page**: [http://localhost:5000/index.html](http://localhost:5000/index.html)
+You should see an output like:
+```text
+Starting Flask server on http://localhost:5000 ...
+ * Running on http://127.0.0.1:5000
+```
+
+---
+
+### Step 8: Open in Your Browser
+Once the server is running, open your web browser (Chrome, Edge, Firefox) and visit:
+
 - **Customer Dashboard**: [http://localhost:5000/dashbord.html](http://localhost:5000/dashbord.html)
-- **Architecture Overview**: [http://localhost:5000/about.html](http://localhost:5000/about.html)
+- **Home Overview**: [http://localhost:5000/index.html](http://localhost:5000/index.html)
+- **Architecture & Notes**: [http://localhost:5000/about.html](http://localhost:5000/about.html)
+
+---
+
+## 🔍 Troubleshooting
+
+| Issue | Likely Cause | Solution |
+| :--- | :--- | :--- |
+| **"Could not connect to database"** | Incorrect password or PostgreSQL not running | Check `DB_PASS` in `app.py` and ensure the PostgreSQL service is started in Windows Services. |
+| **"Address already in use (Port 5000)"** | Another process is using port 5000 | Change `port=5000` to `port=5050` at the bottom of `app.py`, and visit `http://localhost:5050`. |
+| **"ModuleNotFoundError: No module named 'psycopg2'"** | Missing dependencies | Run `pip install -r requirements.txt` inside your active virtual environment. |
 
 ---
 
@@ -96,8 +163,8 @@ The server will start at: `http://localhost:5000`
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/customers` | Returns all customer records sorted by company name |
-| `GET` | `/api/stats` | Computes aggregate totals (customers, credit sum, countries) |
+| `GET` | `/api/customers` | Returns all 122 customer records sorted alphabetically |
+| `GET` | `/api/stats` | Computes aggregate KPI totals (customers, credit sum, countries) |
 | `GET` | `/api/customer/<id>/orders` | Fetches recent orders and total payments for a customer |
 
 ---
