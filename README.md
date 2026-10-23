@@ -1,31 +1,31 @@
 # ClassicModels PostgreSQL CLI Explorer
 
-A terminal-based Python application built for the **Chingu Developer (Python)** track. It connects directly to a PostgreSQL database (`practice_db` / ClassicModels) to browse, search, inspect relational records, and export data to CSV and JSON files without any web framework.
+A simple terminal-based Python application built for the **Chingu Developer (Python)** track. It connects directly to a PostgreSQL database (`practice_db` / ClassicModels) to browse customer accounts, search and filter records, view order histories, and export data to CSV and JSON files without any web framework.
 
 ---
 
 ## Overview
 
-This project was created to demonstrate core Python programming and relational database connectivity. Rather than using mock data, it connects directly to a local PostgreSQL instance to query real-world business data from the ClassicModels dataset.
+I created this project to practice Python programming and relational database operations using PostgreSQL. Instead of using mock data or web frameworks, the entire program runs directly in the terminal and queries live tables from the ClassicModels dataset.
 
-### Skills Demonstrated (Chingu Python Track):
-- **Object-Oriented Programming (OOP)**: Clean separation of concerns with a dedicated `Database` manager class (`database.py`) and application controller (`main.py`).
-- **Database Connectivity**: Direct queries, parameterization, and relational lookups across multiple tables (`customers`, `orders`, and `payments`) using `psycopg2`.
-- **File I/O**: Exporting query results to `.csv` using Python's `csv` module and `.json` using Python's `json` module.
-- **Data Structures**: Working with lists, dictionaries, tuples, and sets for in-memory operations and formatting.
-- **Error Handling**: Graceful error handling using `try/except` blocks for database connection failures and invalid user inputs.
+### Skills Demonstrated:
+- Database connectivity using `psycopg2`
+- Relational queries across multiple tables (`customers`, `orders`, `payments`)
+- File input/output with CSV and JSON export
+- Functions, loops, conditionals, and error handling (`try/except`)
+- Terminal user interface with interactive menu
 
 ---
 
 ## Features
 
-1. **View All Customers**: Displays all 122 customers in a clean, formatted terminal table.
-2. **Search Customers**: Real-time search across company name, city, country, phone number, or customer ID.
-3. **Filter by Country**: Lists available countries and filters customers by selection.
-4. **Relational Order & Payment Summary**: Enter any Customer ID to view their recent orders (from `orders` table) and total payment amount (from `payments` table).
-5. **Database Statistics**: Summarizes total customer count, total credit extended, and distinct countries served.
-6. **Export to CSV**: Saves the customer list directly into an Excel-ready CSV file.
-7. **Export to JSON**: Saves structured customer records into a formatted JSON file.
+1. **View All Customers**: Displays all 122 customers with phone number, city, country, and credit limit.
+2. **Search Customers**: Search by company name, city, country, or customer ID.
+3. **Filter by Country**: Filter customer accounts by specific country name.
+4. **Customer Orders & Payments**: Enter a Customer ID to view recent orders from the `orders` table and total money paid from the `payments` table.
+5. **Database Statistics**: View total customer count, total credit extended, and countries count.
+6. **Export to CSV**: Saves the customer list to `customers_export.csv`.
+7. **Export to JSON**: Saves customer data to `customers_export.json`.
 
 ---
 
@@ -33,8 +33,7 @@ This project was created to demonstrate core Python programming and relational d
 
 ```text
 voyage_submission/
-├── main.py             # Interactive CLI application & menus
-├── database.py         # PostgreSQL database queries & connection class
+├── main.py             # Main CLI application with database queries
 ├── requirements.txt    # Python dependencies (psycopg2-binary)
 ├── .gitignore          # Git exclusion rules
 └── README.md           # Documentation & instructions
@@ -42,11 +41,12 @@ voyage_submission/
 
 ---
 
-## Quick Start Guide
+## Steps to Run the Project
 
 ### 1. Prerequisites
-- Python 3.8 or higher (`python --version`)
-- PostgreSQL running on port `5432` with the `practice_db` database loaded
+- Python 3.8 or higher installed
+- PostgreSQL installed and running on port 5432
+- Database named `practice_db` with ClassicModels tables imported
 
 ### 2. Clone the Repository
 ```bash
@@ -59,43 +59,42 @@ cd voyage_submission
 pip install -r requirements.txt
 ```
 
-### 4. Database Configuration
-Open `database.py` and verify your local PostgreSQL credentials:
+### 4. Configure Database Password
+Open `main.py` and make sure `DB_USER` and `DB_PASS` match your local PostgreSQL login:
 ```python
 DB_HOST = "localhost"
 DB_NAME = "practice_db"
 DB_USER = "postgres"
-DB_PASS = "1234"      # update with your master password
+DB_PASS = "1234"      # change to your pgAdmin password
 DB_PORT = 5432
 ```
 
 ### 5. Run the Application
-Start the CLI tool:
+Start the program from your terminal:
 ```bash
 python main.py
 ```
 
 ---
 
-## Example Usage
+## Example Menu
 
 ```text
-==================================================
-   ClassicModels PostgreSQL Explorer (CLI)
-==================================================
+==========================================
+ ClassicModels PostgreSQL CLI Explorer
+==========================================
 1. View All Customers
-2. Search Customers (by name, city, phone, etc.)
+2. Search Customers
 3. Filter Customers by Country
-4. View Customer Orders & Payment Summary
+4. View Customer Orders and Payments
 5. View Database Statistics
-6. Export All Customers to CSV
-7. Export All Customers to JSON
+6. Export Customers to CSV
+7. Export Customers to JSON
 8. Exit
-==================================================
 Enter choice (1-8):
 ```
 
 ---
 
 ## Dataset Reference
-This project utilizes the **[Classic Models Sample Database](https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)**, a relational schema originally designed for the Eclipse BIRT project.
+This project uses the **[Classic Models Sample Database](https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)**, a relational database originally created for the Eclipse BIRT project.
